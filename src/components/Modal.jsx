@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import CustomSelect from './CustomSelect';
 
 const Modal = ({ type, plan, onClose, showAlert }) => {
@@ -17,7 +18,7 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(onClose, 300);
+    setTimeout(onClose, 500); // Increased to match animation duration
     setStep(1);
     setFormData({});
     setErrors({});
@@ -82,14 +83,101 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
     }
   };
 
+  // Animation variants
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeOut" }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.5, ease: "easeIn" }
+    }
+  };
+
+  const modalVariants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.8,
+      y: 20,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        damping: 15,
+        stiffness: 300,
+        mass: 0.5,
+        delay: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      y: 20,
+      transition: { duration: 0.3, ease: "easeIn" }
+    }
+  };
+
+  const stepIndicatorVariants = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      opacity: 1,
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    }
+  };
+
+  const formItemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    })
+  };
+
+  const buttonVariants = {
+    rest: { scale: 1 },
+    hover: { 
+      scale: 1.02,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    },
+    tap: { scale: 0.98 }
+  };
+
   const renderModalContent = () => {
     switch (type) {
       case 'login':
         return (
           <>
-            <h2 className="text-2xl font-bold text-primary-500 mb-6">Login to Your Account</h2>
+            <motion.h2 
+              className="text-2xl font-bold text-primary-500 mb-6"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              Login to Your Account
+            </motion.h2>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
+              <motion.div 
+                className="mb-4"
+                variants={formItemVariants}
+                custom={0}
+                initial="hidden"
+                animate="visible"
+              >
                 <label className="block text-gray-700 mb-2 font-medium">Email Address</label>
                 <input 
                   type="email" 
@@ -99,9 +187,20 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-              </div>
-              <div className="mb-6">
+                {errors.email && <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >{errors.email}</motion.p>}
+              </motion.div>
+              <motion.div 
+                className="mb-6"
+                variants={formItemVariants}
+                custom={1}
+                initial="hidden"
+                animate="visible"
+              >
                 <label className="block text-gray-700 mb-2 font-medium">Password</label>
                 <input 
                   type="password" 
@@ -111,14 +210,23 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-              </div>
-              <button 
+                {errors.password && <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >{errors.password}</motion.p>}
+              </motion.div>
+              <motion.button 
                 type="submit" 
                 className="w-full btn-primary py-3 rounded-lg font-semibold"
+                variants={buttonVariants}
+                initial="rest"
+                whileHover="hover"
+                whileTap="tap"
               >
                 Login
-              </button>
+              </motion.button>
             </form>
           </>
         );
@@ -126,9 +234,22 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
       case 'signup':
         return (
           <>
-            <h2 className="text-2xl font-bold text-primary-500 mb-6">Create an Account</h2>
+            <motion.h2 
+              className="text-2xl font-bold text-primary-500 mb-6"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              Create an Account
+            </motion.h2>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
+              <motion.div 
+                className="mb-4"
+                variants={formItemVariants}
+                custom={0}
+                initial="hidden"
+                animate="visible"
+              >
                 <label className="block text-gray-700 mb-2 font-medium">Full Name</label>
                 <input 
                   type="text" 
@@ -138,9 +259,20 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     errors.fullName ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
-              </div>
-              <div className="mb-4">
+                {errors.fullName && <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >{errors.fullName}</motion.p>}
+              </motion.div>
+              <motion.div 
+                className="mb-4"
+                variants={formItemVariants}
+                custom={1}
+                initial="hidden"
+                animate="visible"
+              >
                 <label className="block text-gray-700 mb-2 font-medium">Email Address</label>
                 <input 
                   type="email" 
@@ -150,9 +282,20 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-              </div>
-              <div className="mb-6">
+                {errors.email && <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >{errors.email}</motion.p>}
+              </motion.div>
+              <motion.div 
+                className="mb-6"
+                variants={formItemVariants}
+                custom={2}
+                initial="hidden"
+                animate="visible"
+              >
                 <label className="block text-gray-700 mb-2 font-medium">Password</label>
                 <input 
                   type="password" 
@@ -162,14 +305,23 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-              </div>
-              <button 
+                {errors.password && <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >{errors.password}</motion.p>}
+              </motion.div>
+              <motion.button 
                 type="submit" 
                 className="w-full btn-primary py-3 rounded-lg font-semibold"
+                variants={buttonVariants}
+                initial="rest"
+                whileHover="hover"
+                whileTap="tap"
               >
                 Sign Up
-              </button>
+              </motion.button>
             </form>
           </>
         );
@@ -178,23 +330,50 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
         return (
           <>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-primary-500">
+              <motion.h2 
+                className="text-2xl font-bold text-primary-500"
+                key={step}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 {step === 1 ? `Get Started with ${plan} Plan` : 'Complete Your Order'}
-              </h2>
+              </motion.h2>
               <div className="flex items-center">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  step === 1 ? 'bg-primary-500 text-white' : 'bg-gray-300 text-gray-600'
-                }`}>1</div>
+                <motion.div 
+                  variants={stepIndicatorVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                    step === 1 ? 'bg-primary-500 text-white' : 'bg-gray-300 text-gray-600'
+                  }`}
+                >
+                  1
+                </motion.div>
                 <div className="w-8 h-0.5 bg-gray-300 mx-1"></div>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  step === 2 ? 'bg-primary-500 text-white' : 'bg-gray-300 text-gray-600'
-                }`}>2</div>
+                <motion.div 
+                  variants={stepIndicatorVariants}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.1 }}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                    step === 2 ? 'bg-primary-500 text-white' : 'bg-gray-300 text-gray-600'
+                  }`}
+                >
+                  2
+                </motion.div>
               </div>
             </div>
 
             {step === 1 ? (
               <form onSubmit={handleSubmit}>
-                <div className="mb-4">
+                <motion.div 
+                  className="mb-4"
+                  variants={formItemVariants}
+                  custom={0}
+                  initial="hidden"
+                  animate="visible"
+                >
                   <label className="block text-gray-700 mb-2 font-medium">Domain Name</label>
                   <input 
                     type="text" 
@@ -204,9 +383,20 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                       errors.domain ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
-                  {errors.domain && <p className="text-red-500 text-sm mt-1">{errors.domain.message}</p>}
-                </div>
-                <div className="mb-4">
+                  {errors.domain && <motion.p 
+                    className="text-red-500 text-sm mt-1"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                  >{errors.domain}</motion.p>}
+                </motion.div>
+                <motion.div 
+                  className="mb-4"
+                  variants={formItemVariants}
+                  custom={1}
+                  initial="hidden"
+                  animate="visible"
+                >
                   <label className="block text-gray-700 mb-2 font-medium">Email Address</label>
                   <input 
                     type="email" 
@@ -216,9 +406,20 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                       errors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-                </div>
-                <div className="mb-6">
+                  {errors.email && <motion.p 
+                    className="text-red-500 text-sm mt-1"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                  >{errors.email}</motion.p>}
+                </motion.div>
+                <motion.div 
+                  className="mb-6"
+                  variants={formItemVariants}
+                  custom={2}
+                  initial="hidden"
+                  animate="visible"
+                >
                   <label className="block text-gray-700 mb-2 font-medium">Payment Method</label>
                   <CustomSelect 
                     name="paymentMethod"
@@ -230,18 +431,37 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                     ]}
                     error={errors.paymentMethod}
                   />
-                  {errors.paymentMethod && <p className="text-red-500 text-sm mt-1">{errors.paymentMethod.message}</p>}
-                </div>
-                <button 
+                  {errors.paymentMethod && <motion.p 
+                    className="text-red-500 text-sm mt-1"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                  >{errors.paymentMethod}</motion.p>}
+                </motion.div>
+                <motion.button 
                   type="submit" 
                   className="w-full btn-primary py-3 rounded-lg font-semibold"
+                  variants={buttonVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  whileTap="tap"
                 >
                   Continue to Payment
-                </button>
+                </motion.button>
               </form>
             ) : (
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <motion.div 
+                  className="bg-gray-50 p-4 rounded-lg mb-4"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-medium">Plan:</span>
                     <span className="font-semibold">{plan}</span>
@@ -256,33 +476,46 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
                       {plan === 'Starter' ? '£12.99' : plan === 'Professional' ? '£19.99' : '£29.99'}/month
                     </span>
                   </div>
-                </div>
+                </motion.div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => setStep(1)}
                     className="py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    variants={buttonVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    whileTap="tap"
                   >
                     Back
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     type="button"
                     onClick={() => {
                       showAlert(`Your ${plan} plan has been successfully activated!`, 'success');
                       handleClose();
                     }}
                     className="btn-primary py-3 rounded-lg font-semibold"
+                    variants={buttonVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    whileTap="tap"
                   >
                     Complete Purchase
-                  </button>
+                  </motion.button>
                 </div>
 
-                <div className="text-center text-sm text-gray-500 mt-4">
+                <motion.div 
+                  className="text-center text-sm text-gray-500 mt-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
                   <i className="fas fa-lock mr-2"></i>
                   Your payment is secure and encrypted
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
           </>
         );
@@ -293,25 +526,44 @@ const Modal = ({ type, plan, onClose, showAlert }) => {
   };
 
   return (
-    <div 
-      className={`fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-      onClick={handleBackdropClick}
-    >
-      <div 
-        className={`bg-white/90 backdrop-blur-lg rounded-2xl p-8 w-full max-w-md mx-4 glass-card relative overflow-hidden transition-all duration-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}
-      >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-accent-500"></div>
-        
-        <button 
-          onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl transition-colors"
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onClick={handleBackdropClick}
         >
-          <i className="fas fa-times"></i>
-        </button>
-        
-        {renderModalContent()}
-      </div>
-    </div>
+          <motion.div 
+            className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 w-full max-w-md mx-4 glass-card relative overflow-hidden"
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <motion.div 
+              className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-accent-500"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+            
+            <motion.button 
+              onClick={handleClose}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl transition-colors"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <i className="fas fa-times"></i>
+            </motion.button>
+            
+            {renderModalContent()}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
